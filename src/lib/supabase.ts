@@ -11,7 +11,7 @@ export interface Room {
   capacity: number;
 }
 
-export interface Bookable {
+export interface Timeslot {
   id: string;
   room_id: string;
   start_time: string;
@@ -19,6 +19,11 @@ export interface Bookable {
   booked: boolean;
 }
 
+export interface Booking {
+  id: string;
+  timeslot_id: string;
+  name: string;
+}
 export async function getRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from('rooms')
@@ -29,7 +34,15 @@ export async function getRooms(): Promise<Room[]> {
   return data || [];
 }
 
-export async function getBookings(startDate: string, endDate: string): Promise<Bookable[]> {
+export async function getTimeslot(): Promise<Timeslot[]> {
+  const { data, error } = await supabase
+    .from('timeslot')
+    .select('*')
+  
+  if (error) throw error;
+  return data || [];
+}
+export async function getBookings(startDate: string, endDate: string): Promise<Timeslot[]> {
   const { data, error } = await supabase
     .from('timeslots')
     .select('*')
@@ -41,17 +54,17 @@ export async function getBookings(startDate: string, endDate: string): Promise<B
 }
 
 export async function createBooking(booking: {
-  room_id: string;
-  user_name: string;
-  date: string;
-  time: string;
+  id: number;
+  name: string;
 }): Promise<Booking> {
   const { data, error } = await supabase
     .from('bookings')
     .insert([{
       ...booking,
-      date: new Date(booking.date).toISOString().split('T')[0],
-      time: `${booking.time}:00`
+      timeslot_id: booking.id,
+      name: booking.name
+      ,
+
     }])
     .select()
     .single();
@@ -90,7 +103,7 @@ export async function getAvailableTimeSlots(
 
   // Create a map of booked slots
   const bookedSlots = new Set(
-    bookings?.map(b => `${b.room_id}-${b.time.slice(0, 5)}`) || []
+    bookings?.map(b => `${b.room_id}-${b.start_time.slice(0, 5)}`) || []
   );
 
   // Generate available slots

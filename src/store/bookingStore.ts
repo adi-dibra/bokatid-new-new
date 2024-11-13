@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { Room, getBookings, getRooms } from '@/lib/supabase';
+import { Timeslot, getBookings, getTimeslot } from '@/lib/supabase';
 
 interface BookingStore {
-  rooms: Room[];
+  timeslots: Timeslot[];
   selectedRooms: string[];
   selectedDate: string;
   selectedTime: string;
@@ -15,7 +15,7 @@ interface BookingStore {
   setSelectedTime: (time: string) => void;
   setSelectedRoomId: (roomId: string) => void;
   setUserName: (name: string) => void;
-  fetchRooms: () => Promise<void>;
+  fetchTimeslots: () => Promise<void>;
   fetchBookings: (startDate: string, endDate: string) => Promise<void>;
 }
 
@@ -43,11 +43,11 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
   setSelectedRoomId: (roomId) => set({ selectedRoomId: roomId }),
   setUserName: (name) => set({ userName: name }),
 
-  fetchRooms: async () => {
+  fetchTimeslots: async () => {
     set({ isLoading: true, error: null });
     try {
-      const rooms = await getRooms();
-      set({ rooms, isLoading: false });
+      const timeslot = await getTimeslot();
+      set({ timeslot, isLoading: false });
     } catch (error) {
       set({ error: 'Failed to fetch rooms', isLoading: false });
     }

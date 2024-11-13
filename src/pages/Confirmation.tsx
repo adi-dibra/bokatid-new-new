@@ -12,15 +12,15 @@ export function Confirmation() {
   const [error, setError] = useState<string | null>(null);
   
   const { 
-    rooms,
-    selectedRoomId,
+    timeslots,
+    selectedTimeslotId,
     selectedDate,
     selectedTime,
     userName,
     setUserName
   } = useBookingStore();
   
-  const room = rooms.find((r) => r.id === selectedRoomId);
+  const timeslot = timeslots.find((t) => t.id === selectedTimeslotId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,13 +29,12 @@ export function Confirmation() {
 
     try {
       await createBooking({
-        room_id: selectedRoomId,
-        user_name: userName,
-        date: selectedDate,
-        time: selectedTime,
+        id: selectedTimeslotId,
+        name: userName,
       });
       setShowConfirmation(true);
     } catch (err) {
+      console.log(err)
       setError('Det gick inte att boka rummet. Försök igen.');
     } finally {
       setIsSubmitting(false);
@@ -55,7 +54,7 @@ export function Confirmation() {
         <div className="space-y-6 mb-8">
           <div className="bg-neutral-50 p-4 rounded-lg">
             <p className="text-sm text-neutral-500 mb-1">Rum</p>
-            <p className="font-medium">{room?.name}</p>
+            <p className="font-medium">{timeslot?.name}</p>
           </div>
           <div className="bg-neutral-50 p-4 rounded-lg">
             <p className="text-sm text-neutral-500 mb-1">Tid</p>
